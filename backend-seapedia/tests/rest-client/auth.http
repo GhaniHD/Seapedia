@@ -1,0 +1,24 @@
+### Register
+POST http://localhost:8080/api/v1/register
+Content-Type: application/json
+
+{
+    "name": "Admin",
+    "email": "admin@gmail.com",
+    "password": "123456"
+}
+
+### Login
+POST http://localhost:8080/api/v1/login
+Content-Type: application/json
+
+{
+    "email": "admin@gmail.com",
+    "password": "123456"
+}
+
+### Profile
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODMzMjgyOTQsInJvbGUiOiJidXllciIsInVzZXJJRCI6ImNmYzc3YWZiLWI5YzUtNDYyNS05NWZiLWMwZDUwNTM4MmY3MiJ9.TodeCHr9Du4pFMwXTTQt91jABQrqexFMguYhVMDG794
+### Profile
+GET http://localhost:8080/api/v1/profile
+Authorization: Bearer {{token}}
