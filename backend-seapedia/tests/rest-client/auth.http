@@ -1,24 +1,50 @@
-### Register
-POST http://localhost:8080/api/v1/register
+@base = http://localhost:8080/api/v1
+
+### Register buyer baru
+POST {{base}}/register
 Content-Type: application/json
 
 {
-    "name": "Admin",
-    "email": "admin@gmail.com",
-    "password": "123456"
+  "name": "Test Buyer",
+  "email": "testbuyer@mail.com",
+  "password": "password123"
 }
 
-### Login
-POST http://localhost:8080/api/v1/login
+### Login (pakai akun demo buyer)
+# @name loginBuyer
+POST {{base}}/login
 Content-Type: application/json
 
 {
-    "email": "admin@gmail.com",
-    "password": "123456"
+  "email": "buyer@seapedia.com",
+  "password": "buyer12345"
 }
 
-### Profile
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODMzMjgyOTQsInJvbGUiOiJidXllciIsInVzZXJJRCI6ImNmYzc3YWZiLWI5YzUtNDYyNS05NWZiLWMwZDUwNTM4MmY3MiJ9.TodeCHr9Du4pFMwXTTQt91jABQrqexFMguYhVMDG794
-### Profile
-GET http://localhost:8080/api/v1/profile
+### Login sebagai admin (langsung aktif, tanpa select-role)
+POST {{base}}/login
+Content-Type: application/json
+
+{
+  "email": "admin@seapedia.com",
+  "password": "admin12345"
+}
+
+### Contoh select-role kalau punya >1 role (pakai temp token dari login)
+@tempToken = PASTE_TEMP_TOKEN_DI_SINI
+POST {{base}}/select-role
+Authorization: Bearer {{tempToken}}
+Content-Type: application/json
+
+{ "role": "seller" }
+
+### Profile (pakai token dari login di atas)
+@token = PASTE_TOKEN_DI_SINI
+GET {{base}}/profile
 Authorization: Bearer {{token}}
+
+### Tambah role baru untuk akun sendiri (misal buyer ingin jadi seller juga)
+POST {{base}}/roles
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "role": "seller" }

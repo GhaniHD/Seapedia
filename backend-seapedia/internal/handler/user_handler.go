@@ -9,29 +9,21 @@ import (
 	"github.com/google/uuid"
 )
 
-type UserHandler struct {
-	userService service.UserService
-}
+type UserHandler struct{ userService service.UserService }
 
-func NewUserHandler(userService service.UserService) *UserHandler {
-	return &UserHandler{userService: userService}
-}
+func NewUserHandler(userService service.UserService) *UserHandler { return &UserHandler{userService: userService} }
 
 func (h *UserHandler) GetProfile(c *gin.Context) {
-	// user_id diambil dari context, yang di-set oleh JWTMiddleware
-	userIDStr := c.GetString("user_id")
-
-	userID, err := uuid.Parse(userIDStr)
+	userID, err := uuid.Parse(c.GetString("user_id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "user id tidak valid"})
 		return
 	}
-
-	user, err := h.userService.GetUserByID(c.Request.Context(), userID)
+	activeRole := c.GetString("active_role")
+	profile, err := h.userService.GetProfile(c.Request.Context(), userID, activeRole)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
-
-	c.JSON(http.StatusOK, gin.H{"data": user})
+	c.JSON(http.StatusOK, gin.H{"data": profile})
 }

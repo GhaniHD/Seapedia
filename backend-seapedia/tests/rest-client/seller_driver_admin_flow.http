@@ -1,0 +1,35 @@
+@base = http://localhost:8080/api/v1
+@sellerToken = PASTE_TOKEN_SELLER
+@driverToken = PASTE_TOKEN_DRIVER
+@adminToken = PASTE_TOKEN_ADMIN
+
+### Seller: lihat order masuk
+GET {{base}}/seller/orders
+Authorization: Bearer {{sellerToken}}
+
+### Seller: proses order (Sedang Dikemas -> Menunggu Pengirim, buka job untuk driver)
+POST {{base}}/seller/orders/PASTE_ORDER_ID/process
+Authorization: Bearer {{sellerToken}}
+
+### Driver: cari job tersedia
+GET {{base}}/driver/jobs
+Authorization: Bearer {{driverToken}}
+
+### Driver: ambil job
+POST {{base}}/driver/jobs/PASTE_JOB_ID/take
+Authorization: Bearer {{driverToken}}
+
+### Driver: konfirmasi selesai
+POST {{base}}/driver/jobs/PASTE_JOB_ID/complete
+Authorization: Bearer {{driverToken}}
+
+### Admin: dashboard monitoring
+GET {{base}}/admin/dashboard
+Authorization: Bearer {{adminToken}}
+
+### Admin: simulasi hari berikutnya (trigger overdue auto refund/return)
+POST {{base}}/admin/simulate-next-day
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{ "days": 4 }

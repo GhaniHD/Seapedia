@@ -1,0 +1,45 @@
+@base = http://localhost:8080/api/v1
+@token = PASTE_TOKEN_BUYER_DI_SINI
+
+### Lihat katalog publik (guest)
+GET {{base}}/products
+
+### Top up dummy
+POST {{base}}/buyer/wallet/topup
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "amount": 500000 }
+
+### Tambah alamat
+POST {{base}}/buyer/addresses
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "label": "Rumah", "detail": "Jl. Contoh No. 1, Bandung", "is_default": true }
+
+### Tambah item ke cart (ganti product_id dengan id produk demo seller)
+POST {{base}}/buyer/cart/items
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "product_id": "PASTE_PRODUCT_ID", "quantity": 2 }
+
+### Lihat cart
+GET {{base}}/buyer/cart
+Authorization: Bearer {{token}}
+
+### Checkout (pakai voucher demo DEMO10)
+POST {{base}}/buyer/checkout
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "address_id": "PASTE_ADDRESS_ID",
+  "delivery_method": "regular",
+  "discount_code": "DEMO10"
+}
+
+### Riwayat order
+GET {{base}}/buyer/orders
+Authorization: Bearer {{token}}
