@@ -15,6 +15,8 @@ import type {
   CheckoutRequest,
   CheckoutSummaryResponse,
   DeliveryMethod,
+  PromoResponse,
+  VoucherResponse,
 } from "@/lib/types";
 
 // Mirrors backend pkg/utils/order.go — used only for the pre-confirmation
@@ -36,6 +38,8 @@ function BuyerCheckoutContent() {
   const [addressId, setAddressId] = useState("");
   const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>("regular");
   const [discountCode, setDiscountCode] = useState("");
+  const [vouchers, setVouchers] = useState<VoucherResponse[]>([]);
+  const [promos, setPromos] = useState<PromoResponse[]>([]);
 
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -44,14 +48,24 @@ function BuyerCheckoutContent() {
   async function load() {
     setLoading(true);
     try {
-      const [cartData, addrData] = await Promise.all([
+      const [cartData, addrData, voucherData, promoData] = await Promise.all([
         api.get<CartResponse>("/buyer/cart"),
         api.get<AddressResponse[]>("/buyer/addresses"),
+        api.get<VoucherResponse[]>("/vouchers").catch(() => []),
+        api.get<PromoResponse[]>("/promos").catch(() => []),
       ]);
       setCart(cartData);
       setAddresses(addrData || []);
       const def = addrData?.find((a) => a.is_default) || addrData?.[0];
       if (def) setAddressId(def.id);
+
+      const now = Date.now();
+      setVouchers(
+        (voucherData || []).filter(
+          (v) => new Date(v.expiry_date).getTime() > now && v.usage_count < v.usage_limit
+        )
+      );
+      setPromos((promoData || []).filter((p) => new Date(p.expiry_date).getTime() > now));
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Gagal memuat data checkout.");
     } finally {
@@ -216,6 +230,33 @@ function BuyerCheckoutContent() {
               onChange={(e) => setDiscountCode(e.target.value.toUpperCase())}
               placeholder="cth. SEA10"
             />
+            {(vouchers.length > 0 || promos.length > 0) && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {vouchers.map((v) => (
+                  <button
+                    key={v.id}
+                    type="button"
+                    onClick={() => setDiscountCode(v.code)}
+                    className="flex items-center gap-1.5 rounded-full border border-teal-300 bg-teal-100/40 px-3 py-1 text-xs font-semibold text-teal-600 hover:bg-teal-100"
+                  >
+                    <Badge tone="teal">Voucher</Badge>
+                    {v.code}
+                  </button>
+                ))}
+                {promos.map((p) => (
+                  <button
+                    key={p.id}
+                    type="button"
+                    onClick={() => setDiscountCode(p.code)}
+                    className="flex items-center gap-1.5 rounded-full border border-coral-500/30 bg-coral-500/10 px-3 py-1 text-xs font-semibold text-coral-600 hover:bg-coral-500/20"
+                  >
+                    <Badge tone="coral">Promo</Badge>
+                    {p.code}
+                  </button>
+                ))}
+              </div>
+            )}
+            <p className="mt-2 text-xs text-ink/40">Klik salah satu kode untuk menerapkannya.</p>
           </Card>
         </div>
 

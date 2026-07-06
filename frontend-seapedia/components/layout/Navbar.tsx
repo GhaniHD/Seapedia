@@ -53,7 +53,7 @@ export function Navbar() {
 
       {/* Main bar: logo + search + cart */}
       <div className="mx-auto flex max-w-6xl items-center gap-4 px-5 py-3">
-        <Link href="/" className="flex shrink-0 items-center gap-2 text-white">
+        <Link href="/products" className="flex shrink-0 items-center gap-2 text-white">
           <ShipWheelMark className="h-8 w-8 text-white" />
           <span className="font-display text-2xl font-extrabold tracking-tight">SEAPEDIA</span>
         </Link>

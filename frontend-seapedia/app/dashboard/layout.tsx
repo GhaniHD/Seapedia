@@ -15,6 +15,8 @@ import {
   Inbox,
   Truck,
   LayoutDashboard,
+  Receipt,
+  TrendingUp,
   type LucideIcon,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
@@ -34,11 +36,13 @@ const NAV_BY_ROLE: Record<string, NavItem[]> = {
     { href: "/dashboard/buyer/addresses", label: "Alamat", icon: MapPin },
     { href: "/dashboard/buyer/cart", label: "Keranjang", icon: ShoppingCart },
     { href: "/dashboard/buyer/orders", label: "Pesanan saya", icon: Package },
+    { href: "/dashboard/buyer/reports", label: "Laporan belanja", icon: Receipt },
   ],
   seller: [
     { href: "/dashboard/seller/store", label: "Toko saya", icon: Store },
     { href: "/dashboard/seller/products", label: "Produk", icon: Boxes },
     { href: "/dashboard/seller/orders", label: "Pesanan masuk", icon: Inbox },
+    { href: "/dashboard/seller/reports", label: "Laporan pendapatan", icon: TrendingUp },
   ],
   driver: [
     { href: "/dashboard/driver", label: "Job pengiriman", icon: Truck },
@@ -77,7 +81,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <div className="flex min-h-screen bg-sand-100/50">
       <aside className="hidden w-64 shrink-0 flex-col border-r border-sand-200 bg-navy-950 text-sand-100 md:flex">
-        <Link href="/" className="flex items-center gap-2 border-b border-white/10 px-5 py-5 text-sand-50">
+        <Link href="/products" className="flex items-center gap-2 border-b border-white/10 px-5 py-5 text-sand-50">
           <ShipWheelMark className="h-6 w-6 text-teal-400" />
           <span className="font-display text-lg">SEAPEDIA</span>
         </Link>
