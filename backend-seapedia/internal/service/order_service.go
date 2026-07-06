@@ -64,7 +64,7 @@ func (s *orderService) ListSellerOrders(ctx context.Context, sellerUserID uuid.U
 	}
 	out := make([]dto.OrderResponse, 0, len(orders))
 	for _, o := range orders {
-		out = append(out, *s.toOrderResp(ctx, &o, false))
+		out = append(out, *s.toOrderResp(ctx, &o, true))
 	}
 	return out, nil
 }

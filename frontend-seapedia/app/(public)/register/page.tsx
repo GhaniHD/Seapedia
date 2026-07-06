@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
@@ -11,11 +11,31 @@ import { Card } from "@/components/ui/Card";
 import { ShipWheelMark } from "@/components/ui/WaveDivider";
 
 export default function RegisterPage() {
-  const { register, login } = useAuth();
+  const { register, login, isAuthenticated, needRoleSelection, loading: authLoading } = useAuth();
   const router = useRouter();
   const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  // Sudah login (atau sedang menunggu pemilihan role) tidak boleh balik lagi
+  // ke halaman register. Redirect ke tempat yang seharusnya.
+  useEffect(() => {
+    if (authLoading) return;
+    if (needRoleSelection) {
+      router.replace("/select-role");
+    } else if (isAuthenticated) {
+      router.replace("/dashboard");
+    }
+  }, [authLoading, isAuthenticated, needRoleSelection, router]);
+
+  if (authLoading || isAuthenticated || needRoleSelection) {
+    return (
+      <div className="flex min-h-[calc(100vh-64px)] items-center justify-center bg-sand-100/60">
+        <p className="text-sm text-ink/50">Memuat...</p>
+      </div>
+    );
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -63,16 +83,27 @@ export default function RegisterPage() {
             onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
             placeholder="kamu@email.com"
           />
-          <Input
-            label="Kata sandi"
-            type="password"
-            required
-            minLength={8}
-            hint="Minimal 8 karakter."
-            value={form.password}
-            onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
-            placeholder="••••••••"
-          />
+          <div>
+            <Input
+              label="Kata sandi"
+              type={showPassword ? "text" : "password"}
+              required
+              minLength={8}
+              hint="Minimal 8 karakter."
+              value={form.password}
+              onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
+              placeholder="••••••••"
+            />
+            <label className="mt-2 flex items-center gap-2 text-xs text-ink/60">
+              <input
+                type="checkbox"
+                checked={showPassword}
+                onChange={(e) => setShowPassword(e.target.checked)}
+                className="h-3.5 w-3.5 rounded border-sand-300 text-teal-500 focus:ring-teal-500"
+              />
+              Tampilkan sandi
+            </label>
+          </div>
           {error && <p className="text-sm text-red-600">{error}</p>}
           <Button type="submit" loading={loading} className="mt-2">
             Daftar
