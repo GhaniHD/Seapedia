@@ -23,8 +23,25 @@ type Handlers struct {
 	Admin    *handler.AdminHandler
 }
 
+func corsMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", c.GetHeader("Origin"))
+		c.Writer.Header().Set("Vary", "Origin")
+		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization")
+
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+		c.Next()
+	}
+}
+
 func SetupRoutes(h *Handlers, jwtSecret string) *gin.Engine {
 	r := gin.Default()
+	r.Use(corsMiddleware())
 
 	v1 := r.Group("/api/v1")
 	{
