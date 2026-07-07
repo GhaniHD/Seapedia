@@ -204,24 +204,6 @@ Contoh request lengkap tersedia di folder `tests/rest-client` (format `.http`, b
 
 ---
 
-## 7. Yang Sudah & Belum (jujur ke evaluator)
-
-**Sudah diimplementasikan penuh (backend, semua level):**
-- Level 1: auth, multi-role + role selection, public catalog dummy→real, review aplikasi (XSS-safe).
-- Level 2: store & product CRUD dengan ownership check, katalog publik terhubung ke data asli.
-- Level 3: wallet, address, cart (single-store), checkout dengan tax/ongkir/total.
-- Level 4: voucher & promo, seller process order, laporan buyer/seller.
-- Level 5: delivery job find/take/complete, driver earnings (atomic, anti double-take).
-- Level 6: admin dashboard monitoring, voucher/promo management endpoints, simulate next day + auto refund/return dengan guard anti double-processing.
-- Level 7: parameterized query, XSS sanitization, validasi input, ownership check, role check server-side.
-
-**Belum ada (di luar cakupan backend / butuh kerja tambahan di sisi frontend & deployment):**
-- Frontend/UI (dokumen ini murni backend API sesuai permintaan).
-- Swagger/OpenAPI JSON otomatis — saat ini didokumentasikan manual di README + `tests/rest-client` (silakan generate dari sini kalau ingin submit Swagger file demi bonus dokumentasi).
-- Deployment publik (bonus 15 pts) — docker-compose sudah siap dipakai di platform apapun (Railway/Fly.io/VPS), tinggal deploy.
-
----
-
 ## 8. Catatan Teknis
 
 - Dependency di `go.mod` disesuaikan ke versi yang kompatibel dengan toolchain Go yang tersedia di lingkungan build (beberapa `replace` directive mengarahkan modul `golang.org/x/*` ke mirror GitHub-nya) — ini murni penyesuaian versi, tidak mengubah perilaku library.
