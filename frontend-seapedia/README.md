@@ -1,6 +1,6 @@
 # SEAPEDIA — Frontend
 
-Frontend marketplace SEAPEDIA (Level 1–3), dibangun dengan **Next.js 16 (App Router)
+Frontend marketplace SEAPEDIA (Level 1–5), dibangun dengan **Next.js 16 (App Router)
 + React 19 + Tailwind CSS 4**, memakai native `fetch` + React Context untuk state
 (tanpa library data-fetching tambahan).
 
@@ -41,7 +41,27 @@ components/
   features/         komponen fitur (ReviewSection, ProductCard, RequireRole, AddToCartButton)
 ```
 
-## Alur bisnis yang diimplementasikan (Level 1–3)
+Struktur `app/dashboard/` per peran (ringkas):
+```
+dashboard/
+  page.tsx              ringkasan profil & peran aktif
+  buyer/
+    wallet/              saldo + riwayat top-up
+    addresses/           alamat pengiriman
+    cart/                keranjang (single-store)
+    checkout/            checkout (delivery method, voucher/promo, ringkasan pajak)
+    orders/[id]/         riwayat & detail pesanan (status history)
+    reports/             laporan pengeluaran buyer
+  seller/
+    store/               profil toko (nama unik)
+    products/            CRUD produk
+    orders/               pesanan masuk + aksi "Proses pesanan"
+    reports/             laporan pendapatan seller
+  driver/                 cari job, ambil job, konfirmasi selesai, riwayat & penghasilan
+  admin/                  placeholder navigasi (fitur penuh menyusul di Level 6)
+```
+
+## Alur bisnis yang diimplementasikan (Level 1–5)
 
 ### 1. Autentikasi & peran ganda
 - Registrasi selalu menghasilkan akun dengan peran **Buyer** saja.
@@ -87,14 +107,36 @@ Ongkir tetap per metode (harus sinkron dengan backend):
 > voucher/promo yang tervalidasi) selalu berasal dari respons
 > `POST /buyer/checkout`, bukan dari estimasi ini.
 
-### 4. Ulasan aplikasi publik
+### 4. Diskon: Voucher & Promo
+Di halaman checkout (`/dashboard/buyer/checkout`), buyer bisa memasukkan kode
+voucher/promo (opsional) sebelum konfirmasi. Voucher & promo yang masih aktif
+(belum expired, dan untuk voucher masih ada sisa kuota) ditampilkan sebagai
+pilihan cepat di form. Validasi kode (expired/habis kuota/tidak ditemukan)
+dilakukan di backend saat `POST /buyer/checkout`; hasil validasi (`discount_amount`,
+`discount_kind`: `voucher` atau `promo`) ditampilkan jelas di ringkasan checkout,
+terpisah dari ongkir dan PPN.
+
+### 5. Pemrosesan pesanan seller & job driver
+- **Seller** (`/dashboard/seller/orders`): melihat daftar pesanan masuk beserta
+  riwayat status (`status_history` dengan timestamp), dan bisa menekan
+  **"Proses pesanan"** untuk memindahkan status dari `Sedang Dikemas` →
+  `Menunggu Pengirim`. Hanya pesanan milik toko sendiri yang bisa diproses.
+- **Driver** (`/dashboard/driver`): melihat daftar *job tersedia* (pesanan yang
+  sudah berstatus `Menunggu Pengirim`), bisa **ambil job** (status →
+  `Sedang Dikirim`), lalu **konfirmasi selesai** (status → `Pesanan Selesai`).
+  Race condition ditangani di backend — jika dua driver mencoba ambil job yang
+  sama, hanya salah satu yang berhasil dan frontend menampilkan pesan error
+  lalu me-refresh daftar. Dashboard driver juga menampilkan ringkasan
+  penghasilan (total & jumlah job selesai) dan riwayat job yang sudah selesai.
+
+### 6. Ulasan aplikasi publik
 Form di landing page (`#reviews`) bisa diisi oleh siapa saja (guest atau user
 login) tanpa perlu checkout, sesuai aturan bisnis. Komentar dirender sebagai
 teks React biasa (`{comment}`), **tidak pernah** lewat `dangerouslySetInnerHTML`,
 sehingga otomatis aman dari eksekusi script (hardening XSS penuh menyusul di
 Level 7).
 
-### 5. Amplop respons backend
+### 7. Amplop respons backend
 Semua endpoint backend membungkus payload sukses sebagai `{ "data": ... }`
 atau `{ "message": ... }`, dan error sebagai `{ "error": ... }`. Ini di-unwrap
 sekali di `lib/api.ts` sehingga seluruh kode halaman bekerja langsung dengan
@@ -102,16 +144,24 @@ tipe DTO tanpa perlu mengurus envelope berulang-ulang.
 
 ## Cakupan level saat ini
 
-Iterasi ini mengimplementasikan **Level 1 sampai Level 3** penuh:
+Iterasi ini mengimplementasikan **Level 1 sampai Level 5** penuh:
 - Level 1: landing, katalog & detail produk publik, auth + role awareness,
   ulasan publik, komponen & routing dasar.
 - Level 2: manajemen toko seller (nama unik), CRUD produk seller, katalog
   publik terhubung ke data asli.
 - Level 3: dompet & top-up buyer, alamat pengiriman, keranjang single-store,
   checkout (subtotal/ongkir/PPN/total), riwayat & detail pesanan buyer,
-  daftar pesanan masuk seller (read-only — pemrosesan pesanan menyusul di
-  Level 4).
+  daftar pesanan masuk seller.
+- Level 4: voucher & promo (validasi expiry/kuota di backend, efek diskon
+  tampil di ringkasan checkout), aksi seller "Proses pesanan" (Sedang Dikemas
+  → Menunggu Pengirim) dengan status history bertimestamp, laporan
+  pengeluaran buyer dan laporan pendapatan seller.
+- Level 5: dashboard driver penuh — cari job tersedia (hanya pesanan
+  `Menunggu Pengirim`), ambil job (→ Sedang Dikirim, dengan penanganan race
+  condition di backend), konfirmasi selesai (→ Pesanan Selesai), ringkasan
+  penghasilan, dan riwayat job.
 
-Dashboard Driver & Admin sudah punya entri navigasi sebagai placeholder untuk
-level selanjutnya, sesuai instruksi soal ("higher levels assume previous
-levels are done; placeholders are acceptable until the relevant level").
+Dashboard Admin sudah punya entri navigasi sebagai placeholder untuk Level 6
+(Admin Monitoring and Overdue Handling), sesuai instruksi soal ("higher levels
+assume previous levels are done; placeholders are acceptable until the
+relevant level").
