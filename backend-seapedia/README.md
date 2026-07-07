@@ -78,7 +78,7 @@ Sesuai business rule di dokumen tugas, **role yang disimpan di database hanya 4*
 
 ---
 
-## 4. Business Rules & Cara Perhitungan (penting untuk evaluator)
+## 4. Business Rules & Cara Perhitungan
 
 ### Single-store checkout
 Satu cart (`carts` + `cart_items`) hanya boleh berisi produk dari **satu toko**. Field `carts.store_id` di-set begitu item pertama ditambahkan; kalau buyer coba tambah produk dari toko lain, request **ditolak** dengan pesan jelas minta clear cart dulu (`internal/service/cart_service.go`, fungsi `AddItem`). Cart otomatis "bebas ganti toko" lagi setelah kosong.
