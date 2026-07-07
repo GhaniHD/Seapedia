@@ -78,7 +78,7 @@ Sesuai business rule di dokumen tugas, **role yang disimpan di database hanya 4*
 
 ---
 
-## 4. Business Rules & Cara Perhitungan (penting untuk evaluator)
+## 4. Business Rules & Cara Perhitungan
 
 ### Single-store checkout
 Satu cart (`carts` + `cart_items`) hanya boleh berisi produk dari **satu toko**. Field `carts.store_id` di-set begitu item pertama ditambahkan; kalau buyer coba tambah produk dari toko lain, request **ditolak** dengan pesan jelas minta clear cart dulu (`internal/service/cart_service.go`, fungsi `AddItem`). Cart otomatis "bebas ganti toko" lagi setelah kosong.
@@ -201,24 +201,6 @@ Base URL: `/api/v1`. Endpoint privat butuh header `Authorization: Bearer <token>
 | POST/GET | `/admin/vouchers`, `/admin/promos` | Kelola diskon |
 
 Contoh request lengkap tersedia di folder `tests/rest-client` (format `.http`, bisa langsung dijalankan dengan ekstensi REST Client di VS Code) — silakan lengkapi dengan skenario di atas untuk keperluan demo/testing manual.
-
----
-
-## 7. Yang Sudah & Belum (jujur ke evaluator)
-
-**Sudah diimplementasikan penuh (backend, semua level):**
-- Level 1: auth, multi-role + role selection, public catalog dummy→real, review aplikasi (XSS-safe).
-- Level 2: store & product CRUD dengan ownership check, katalog publik terhubung ke data asli.
-- Level 3: wallet, address, cart (single-store), checkout dengan tax/ongkir/total.
-- Level 4: voucher & promo, seller process order, laporan buyer/seller.
-- Level 5: delivery job find/take/complete, driver earnings (atomic, anti double-take).
-- Level 6: admin dashboard monitoring, voucher/promo management endpoints, simulate next day + auto refund/return dengan guard anti double-processing.
-- Level 7: parameterized query, XSS sanitization, validasi input, ownership check, role check server-side.
-
-**Belum ada (di luar cakupan backend / butuh kerja tambahan di sisi frontend & deployment):**
-- Frontend/UI (dokumen ini murni backend API sesuai permintaan).
-- Swagger/OpenAPI JSON otomatis — saat ini didokumentasikan manual di README + `tests/rest-client` (silakan generate dari sini kalau ingin submit Swagger file demi bonus dokumentasi).
-- Deployment publik (bonus 15 pts) — docker-compose sudah siap dipakai di platform apapun (Railway/Fly.io/VPS), tinggal deploy.
 
 ---
 
