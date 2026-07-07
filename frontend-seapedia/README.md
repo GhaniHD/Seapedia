@@ -2,8 +2,7 @@
 
 Frontend marketplace SEAPEDIA (Level 1–3), dibangun dengan **Next.js 16 (App Router)
 + React 19 + Tailwind CSS 4**, memakai native `fetch` + React Context untuk state
-(tanpa library data-fetching tambahan). Tampilan bergaya marketplace umum
-(mirip Shopee/Tokopedia/Lazada) dengan warna biru sebagai warna utama.
+(tanpa library data-fetching tambahan).
 
 ## Menjalankan proyek
 
